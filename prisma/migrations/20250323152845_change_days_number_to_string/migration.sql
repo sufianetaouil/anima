@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Job" ALTER COLUMN "daysNumber" SET DATA TYPE TEXT;

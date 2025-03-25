@@ -1,15 +1,19 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { formatPhoneNumber } from "@/lib/utils";
+import { Session } from "next-auth";
+
+type Params = Promise<{ employerId: string }>;
 
 export async function GET(
   req: Request,
-  { params }: { params: { employerId: string } }
+  { params }: { params: Params }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions) as Session;
+    const resolvedParams = await params;
 
     if (!session) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -17,7 +21,7 @@ export async function GET(
 
     const employer = await prisma.employer.findUnique({
       where: {
-        id: params.employerId,
+        id: resolvedParams.employerId,
       },
       include: {
         jobs: true,
@@ -33,10 +37,11 @@ export async function GET(
 
 export async function PUT(
   req: Request,
-  { params }: { params: { employerId: string } }
+  { params }: { params: Params }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions) as Session;
+    const resolvedParams = await params;
 
     if (!session) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -46,7 +51,7 @@ export async function PUT(
 
     const employer = await prisma.employer.update({
       where: {
-        id: params.employerId,
+        id: resolvedParams.employerId,
       },
       data: {
         businessName: body.businessName,
@@ -72,10 +77,11 @@ export async function PUT(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { employerId: string } }
+  { params }: { params: Params }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions) as Session;
+    const resolvedParams = await params;
 
     if (!session) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -84,14 +90,14 @@ export async function DELETE(
     // Delete all associated jobs first
     await prisma.job.deleteMany({
       where: {
-        employerId: params.employerId,
+        employerId: resolvedParams.employerId,
       },
     });
 
     // Then delete the employer
     const employer = await prisma.employer.delete({
       where: {
-        id: params.employerId,
+        id: resolvedParams.employerId,
       },
     });
 

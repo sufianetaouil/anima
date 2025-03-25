@@ -1,14 +1,18 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import { Session } from "next-auth";
+
+type Params = Promise<{ jobId: string }>;
 
 export async function GET(
   req: Request,
-  { params }: { params: { jobId: string } }
+  { params }: { params: Params }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions) as Session;
+    const resolvedParams = await params;
 
     if (!session) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -16,7 +20,7 @@ export async function GET(
 
     const job = await prisma.job.findUnique({
       where: {
-        id: params.jobId,
+        id: resolvedParams.jobId,
       },
       include: {
         employer: true,
@@ -32,10 +36,11 @@ export async function GET(
 
 export async function PUT(
   req: Request,
-  { params }: { params: { jobId: string } }
+  { params }: { params: Params }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions) as Session;
+    const resolvedParams = await params;
 
     if (!session) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -45,7 +50,7 @@ export async function PUT(
 
     const job = await prisma.job.update({
       where: {
-        id: params.jobId,
+        id: resolvedParams.jobId,
       },
       data: {
         employerId: body.employerId,
@@ -77,10 +82,11 @@ export async function PUT(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { jobId: string } }
+  { params }: { params: Params }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions) as Session;
+    const resolvedParams = await params;
 
     if (!session) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -88,7 +94,7 @@ export async function DELETE(
 
     const job = await prisma.job.delete({
       where: {
-        id: params.jobId,
+        id: resolvedParams.jobId,
       },
     });
 

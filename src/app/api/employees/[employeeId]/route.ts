@@ -1,15 +1,17 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 import { formatPhoneNumber } from "@/lib/utils";
+
+type Params = Promise<{ employeeId: string }>;
 
 export async function GET(
   req: Request,
-  { params }: { params: { employeeId: string } }
+  { params }: { params: Params }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getSession();
+    const resolvedParams = await params;
 
     if (!session) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -17,7 +19,7 @@ export async function GET(
 
     const employee = await prisma.employee.findUnique({
       where: {
-        id: params.employeeId,
+        id: resolvedParams.employeeId,
       },
       include: {
         refunds: true,
@@ -33,10 +35,11 @@ export async function GET(
 
 export async function PUT(
   req: Request,
-  { params }: { params: { employeeId: string } }
+  { params }: { params: Params }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getSession();
+    const resolvedParams = await params;
 
     if (!session) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -46,7 +49,7 @@ export async function PUT(
 
     const employee = await prisma.employee.update({
       where: {
-        id: params.employeeId,
+        id: resolvedParams.employeeId,
       },
       data: {
         name: body.name,
@@ -81,10 +84,11 @@ export async function PUT(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { employeeId: string } }
+  { params }: { params: Params }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getSession();
+    const resolvedParams = await params;
 
     if (!session) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -92,7 +96,7 @@ export async function DELETE(
 
     const employee = await prisma.employee.delete({
       where: {
-        id: params.employeeId,
+        id: resolvedParams.employeeId,
       },
     });
 

@@ -8,14 +8,17 @@ export const metadata: Metadata = {
   description: "Edit job details",
 };
 
+type Params = Promise<{ jobId: string }>;
+
 export default async function EditJobPage({
   params,
 }: {
-  params: { jobId: string };
+  params: Params;
 }) {
+  const resolvedParams = await params;
   const jobData = await prisma.job.findUnique({
     where: {
-      id: params.jobId,
+      id: resolvedParams.jobId,
     },
   });
 

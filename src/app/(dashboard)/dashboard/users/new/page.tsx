@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 import { UserForm } from "@/components/forms/user-form";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 
@@ -11,10 +10,10 @@ export const metadata: Metadata = {
 };
 
 export default async function NewUserPage() {
-  const session = await getServerSession(authOptions);
+  const session = await getSession();
 
   if (!session?.user?.email) {
-    redirect("/auth/signin");
+    redirect("/login");
   }
 
   // Check if the current user is an admin

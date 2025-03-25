@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = "postgresql://postgres:9339@localhost:5432/naima_employment"
 }
 
 model User {
@@ -45,9 +45,9 @@ model Job {
   id            String    @id @default(cuid())
   employer      Employer  @relation(fields: [employerId], references: [id])
   employerId    String
-  daysNumber    Int?
+  daysNumber    String?
   daysPerWeek   Int?
-  hoursNumber   Int?
+  hoursNumber   String?
   pricePerHour  Decimal?
   tips          Boolean?
   paymentMethod String?   // 'cash' or 'check'

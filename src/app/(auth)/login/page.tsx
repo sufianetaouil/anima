@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import Link from "next/link";
 import { UserLoginForm } from "@/components/auth/user-login-form";
 
 export const metadata: Metadata = {

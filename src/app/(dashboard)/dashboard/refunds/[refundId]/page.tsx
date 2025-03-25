@@ -8,53 +8,41 @@ export const metadata: Metadata = {
   description: "Edit refund details",
 };
 
+type Params = Promise<{ refundId: string }>;
+
 export default async function EditRefundPage({
   params,
 }: {
-  params: { refundId: string };
+  params: Params;
 }) {
-  const [refundData, employees] = await Promise.all([
-    prisma.refund.findUnique({
-      where: {
-        id: params.refundId,
-      },
-    }),
-    prisma.employee.findMany({
-      select: {
-        id: true,
-        name: true,
-      },
-      orderBy: {
-        name: "asc",
-      },
-    }),
-  ]);
+  const resolvedParams = await params;
+  const refundData = await prisma.refund.findUnique({
+    where: {
+      id: resolvedParams.refundId,
+    },
+  });
 
   if (!refundData) {
     notFound();
   }
 
-  // Transform employee data to match the expected format
-  const formattedEmployees = employees.map(employee => ({
-    id: employee.id,
-    firstName: employee.name.split(" ")[0] || "",
-    lastName: employee.name.split(" ").slice(1).join(" ") || "",
-  }));
-
-  // Convert Decimal values to numbers
+  // Convert decimal values to numbers for the form
   const refund = {
     ...refundData,
-    paidBefore: refundData.paidBefore ? Number(refundData.paidBefore) : null,
-    hoursWorking: refundData.hoursWorking ? Number(refundData.hoursWorking) : null,
-    salaryPerHour: refundData.salaryPerHour ? Number(refundData.salaryPerHour) : null,
-    commissionRate: refundData.commissionRate ? Number(refundData.commissionRate) : null,
-    lastBalance: refundData.lastBalance ? Number(refundData.lastBalance) : null,
+    paidBefore: refundData.paidBefore !== null ? Number(refundData.paidBefore) : null,
+    hoursWorking: refundData.hoursWorking !== null ? Number(refundData.hoursWorking) : null,
+    salaryPerHour: refundData.salaryPerHour !== null ? Number(refundData.salaryPerHour) : null,
+    commissionRate: refundData.commissionRate !== null ? Number(refundData.commissionRate) : null,
+    lastBalance: refundData.lastBalance !== null ? Number(refundData.lastBalance) : null,
   };
 
   return (
     <div>
       <h2 className="mb-8 text-2xl font-bold">Edit Refund</h2>
-      <RefundForm mode="edit" refund={refund} employees={formattedEmployees} />
+      <RefundForm
+        mode="edit"
+        refund={refund}
+      />
     </div>
   );
 } 

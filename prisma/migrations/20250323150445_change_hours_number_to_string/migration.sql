@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Job" ALTER COLUMN "hoursNumber" SET DATA TYPE TEXT;

@@ -53,11 +53,6 @@ interface Job {
   updatedAt: Date;
 }
 
-interface Employer {
-  id: string;
-  businessName: string;
-}
-
 interface JobFormProps {
   job?: Job;
   mode: "create" | "edit";

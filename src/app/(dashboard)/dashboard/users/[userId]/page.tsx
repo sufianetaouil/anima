@@ -2,23 +2,25 @@ import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { UserForm } from "@/components/forms/user-form";
 import { notFound, redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "Edit User - Naima Employment Agency",
   description: "Edit user details",
 };
 
+type Params = Promise<{ userId: string }>;
+
 export default async function EditUserPage({
   params,
 }: {
-  params: { userId: string };
+  params: Params;
 }) {
-  const session = await getServerSession(authOptions);
+  const session = await getSession();
+  const resolvedParams = await params;
 
   if (!session?.user?.email) {
-    redirect("/auth/signin");
+    redirect("/login");
   }
 
   // Check if the current user is an admin
@@ -31,27 +33,20 @@ export default async function EditUserPage({
     redirect("/dashboard");
   }
 
-  const user = await prisma.user.findUnique({
+  const userData = await prisma.user.findUnique({
     where: {
-      id: params.userId,
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      isAdmin: true,
-      createdAt: true,
+      id: resolvedParams.userId,
     },
   });
 
-  if (!user) {
+  if (!userData) {
     notFound();
   }
 
   return (
     <div>
       <h2 className="mb-8 text-2xl font-bold">Edit User</h2>
-      <UserForm mode="edit" user={user} />
+      <UserForm mode="edit" user={userData} />
     </div>
   );
 } 

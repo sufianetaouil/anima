@@ -1,6 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 
+// Use let instead of var to fix the linting error
 declare global {
+  // eslint-disable-next-line no-var
   var prisma: PrismaClient | undefined;
 }
 

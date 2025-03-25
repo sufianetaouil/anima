@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Select } from "@/components/ui/select";
 import { EmployeeCombobox } from "@/components/ui/employee-combobox";
 
 const formSchema = z.object({
@@ -35,19 +34,12 @@ interface Refund {
   updatedAt: Date;
 }
 
-interface Employee {
-  id: string;
-  firstName: string;
-  lastName: string;
-}
-
 interface RefundFormProps {
   refund?: Refund;
-  employees: Employee[];
   mode: "create" | "edit";
 }
 
-export function RefundForm({ refund, employees, mode }: RefundFormProps) {
+export function RefundForm({ refund, mode }: RefundFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 

@@ -1,19 +1,17 @@
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { UsersClient } from "./users-client";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-
+import { getSession } from "@/lib/auth";
 export const metadata: Metadata = {
   title: "Users - Naima Employment Agency",
   description: "Manage users",
 };
 
 export default async function UsersPage() {
-  const session = await getServerSession(authOptions);
+  const session = await getSession();
 
-  if (!session?.user?.email) {
+  if (!session || !session.user?.email) {
     redirect("/auth/signin");
   }
 

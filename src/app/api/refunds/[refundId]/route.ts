@@ -1,14 +1,18 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import { Session } from "next-auth";
+
+type Params = Promise<{ refundId: string }>;
 
 export async function GET(
   req: Request,
-  { params }: { params: { refundId: string } }
+  { params }: { params: Params }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions) as Session;
+    const resolvedParams = await params;
 
     if (!session) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -16,7 +20,7 @@ export async function GET(
 
     const refund = await prisma.refund.findUnique({
       where: {
-        id: params.refundId,
+        id: resolvedParams.refundId,
       },
       include: {
         employee: true,
@@ -32,10 +36,11 @@ export async function GET(
 
 export async function PUT(
   req: Request,
-  { params }: { params: { refundId: string } }
+  { params }: { params: Params }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions) as Session;
+    const resolvedParams = await params;
 
     if (!session) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -45,7 +50,7 @@ export async function PUT(
 
     const refund = await prisma.refund.update({
       where: {
-        id: params.refundId,
+        id: resolvedParams.refundId,
       },
       data: {
         employeeId: body.employeeId,
@@ -68,10 +73,11 @@ export async function PUT(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { refundId: string } }
+  { params }: { params: Params }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions) as Session;
+    const resolvedParams = await params;
 
     if (!session) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -79,7 +85,7 @@ export async function DELETE(
 
     const refund = await prisma.refund.delete({
       where: {
-        id: params.refundId,
+        id: resolvedParams.refundId,
       },
     });
 

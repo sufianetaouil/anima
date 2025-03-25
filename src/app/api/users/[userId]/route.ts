@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
+type Params = Promise<{ userId: string }>;
 
 export async function GET(
   req: Request,
-  { params }: { params: { userId: string } }
+  { params }: { params: Params }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getSession();
+    const resolvedParams = await params;
 
     if (!session?.user?.email) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -26,7 +27,7 @@ export async function GET(
 
     const user = await prisma.user.findUnique({
       where: {
-        id: params.userId,
+        id: resolvedParams.userId,
       },
       select: {
         id: true,
@@ -46,10 +47,11 @@ export async function GET(
 
 export async function PUT(
   req: Request,
-  { params }: { params: { userId: string } }
+  { params }: { params: Params }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getSession();
+    const resolvedParams = await params;
 
     if (!session?.user?.email) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -69,7 +71,7 @@ export async function PUT(
 
     // Check if trying to update admin user's email or role
     const targetUser = await prisma.user.findUnique({
-      where: { id: params.userId },
+      where: { id: resolvedParams.userId },
       select: { email: true },
     });
 
@@ -77,7 +79,7 @@ export async function PUT(
       // Only allow updating the name for the admin user
       const user = await prisma.user.update({
         where: {
-          id: params.userId,
+          id: resolvedParams.userId,
         },
         data: {
           name: body.name,
@@ -97,7 +99,7 @@ export async function PUT(
     // For non-admin users, allow updating all fields
     const user = await prisma.user.update({
       where: {
-        id: params.userId,
+        id: resolvedParams.userId,
       },
       data: {
         name: body.name,
@@ -122,10 +124,11 @@ export async function PUT(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { userId: string } }
+  { params }: { params: Params }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getSession();
+    const resolvedParams = await params;
 
     if (!session?.user?.email) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -143,7 +146,7 @@ export async function DELETE(
 
     // Check if trying to delete admin user
     const targetUser = await prisma.user.findUnique({
-      where: { id: params.userId },
+      where: { id: resolvedParams.userId },
       select: { email: true },
     });
 
@@ -153,7 +156,7 @@ export async function DELETE(
 
     const user = await prisma.user.delete({
       where: {
-        id: params.userId,
+        id: resolvedParams.userId,
       },
     });
 

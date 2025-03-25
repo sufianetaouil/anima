@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useSession, signOut } from "next-auth/react";
 import { redirect } from "next/navigation";
@@ -17,7 +17,7 @@ import {
 import { useState } from "react";
 import { Session } from "next-auth";
 
-export default function DashboardLayout({
+export function ClientLayout({
   children,
 }: {
   children: React.ReactNode;

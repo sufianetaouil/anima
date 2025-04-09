@@ -10,6 +10,7 @@ import {
   getSortedRowModel,
   ColumnFiltersState,
   getFilteredRowModel,
+  VisibilityState,
 } from "@tanstack/react-table";
 import { useState } from "react";
 import { Search, ChevronLeft, ChevronRight, Plus } from "lucide-react";
@@ -24,6 +25,7 @@ interface DataTableProps<TData, TValue> {
   onRowClick?: (row: TData) => void;
   createNewPath?: string;
   createNewText?: string;
+  initialColumnVisibility?: VisibilityState;
 }
 
 export function DataTable<TData, TValue>({
@@ -35,10 +37,12 @@ export function DataTable<TData, TValue>({
   onRowClick,
   createNewPath,
   createNewText = "Create New",
+  initialColumnVisibility = {},
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, ] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(initialColumnVisibility);
 
   const table = useReactTable({
     data,
@@ -49,10 +53,12 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onGlobalFilterChange: setGlobalFilter,
+    onColumnVisibilityChange: setColumnVisibility,
     state: {
       sorting,
       columnFilters,
       globalFilter,
+      columnVisibility,
     },
     globalFilterFn: (row, columnId, filterValue) => {
       return searchableColumns.some(column => {

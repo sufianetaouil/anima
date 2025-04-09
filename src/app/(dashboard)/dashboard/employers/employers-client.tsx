@@ -8,10 +8,16 @@ interface Employer {
   id: string;
   businessName: string;
   phone: string | null;
+  rawPhone?: string | null;
   contactName: string | null;
   state: string | null;
   createdAt: Date;
 }
+
+const stripPhoneFormatting = (phone: string | null): string | null => {
+  if (!phone) return null;
+  return phone.replace(/\D/g, '');
+};
 
 const columns: ColumnDef<Employer>[] = [
   {
@@ -29,6 +35,11 @@ const columns: ColumnDef<Employer>[] = [
   {
     accessorKey: "phone",
     header: "Phone",
+  },
+  {
+    accessorKey: "rawPhone",
+    header: "Raw Phone",
+    enableHiding: true,
   },
   {
     accessorKey: "contactName",
@@ -81,6 +92,16 @@ interface EmployersClientProps {
 }
 
 export function EmployersClient({ employers }: EmployersClientProps) {
+  const enrichedEmployers = employers.map(employer => ({
+    ...employer,
+    rawPhone: stripPhoneFormatting(employer.phone)
+  }));
+  
+  // Initial column visibility state - hide rawPhone column
+  const initialColumnVisibility = {
+    rawPhone: false
+  };
+  
   return (
     <div>
       <div className="mb-8 flex items-center justify-between">
@@ -94,10 +115,11 @@ export function EmployersClient({ employers }: EmployersClientProps) {
       </div>
       <DataTable 
         columns={columns} 
-        data={employers} 
+        data={enrichedEmployers} 
         searchColumn="businessName"
         searchPlaceholder="Search by business name, phone, or state..."
-        searchableColumns={["businessName", "phone", "state"]}
+        searchableColumns={["businessName", "phone", "rawPhone", "state"]}
+        initialColumnVisibility={initialColumnVisibility}
       />
     </div>
   );

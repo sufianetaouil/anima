@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
-import { formatPhoneNumber } from "@/lib/utils";
-import { Session } from "next-auth";
+import { getSession } from "@/lib/auth";
 
 type Params = Promise<{ employerId: string }>;
 
@@ -12,7 +9,7 @@ export async function GET(
   { params }: { params: Params }
 ) {
   try {
-    const session = await getServerSession(authOptions) as Session;
+    const session = await getSession();
     const resolvedParams = await params;
 
     if (!session) {
@@ -40,7 +37,7 @@ export async function PUT(
   { params }: { params: Params }
 ) {
   try {
-    const session = await getServerSession(authOptions) as Session;
+    const session = await getSession();
     const resolvedParams = await params;
 
     if (!session) {
@@ -55,9 +52,9 @@ export async function PUT(
       },
       data: {
         businessName: body.businessName,
-        phone: body.phone ? formatPhoneNumber(body.phone) : null,
-        faxNumber: body.faxNumber ? formatPhoneNumber(body.faxNumber) : null,
-        cellPhone: body.cellPhone ? formatPhoneNumber(body.cellPhone) : null,
+        phone: body.phone || null,
+        faxNumber: body.faxNumber || null,
+        cellPhone: body.cellPhone || null,
         contactName: body.contactName,
         address: body.address,
         city: body.city,
@@ -80,7 +77,7 @@ export async function DELETE(
   { params }: { params: Params }
 ) {
   try {
-    const session = await getServerSession(authOptions) as Session;
+    const session = await getSession();
     const resolvedParams = await params;
 
     if (!session) {

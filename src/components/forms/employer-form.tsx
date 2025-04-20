@@ -6,7 +6,6 @@ import * as z from "zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Select } from "@/components/ui/select";
-import { formatPhoneNumber } from "@/lib/utils";
 
 const formSchema = z.object({
   businessName: z.string().min(1, "Business name is required"),

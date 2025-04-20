@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "@/lib/session";
+import { getSession } from "@/lib/auth";
 import { generateMemberId } from "@/lib/utils";
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession();
+    const session = await getSession();
 
     if (!session) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -28,13 +28,10 @@ export async function POST(req: Request) {
       }
     }
 
-    // Combine first and last name
-    const name = `${body.firstName} ${body.lastName}`.trim();
-
     const employee = await prisma.employee.create({
       data: {
         memberId,
-        name,
+        name: body.name,
         phone: body.phone || null,
         address: body.address || null,
         city: body.city || null,
@@ -54,7 +51,7 @@ export async function POST(req: Request) {
 
 export async function GET() {
   try {
-    const session = await getServerSession();
+    const session = await getSession();
 
     if (!session) {
       return new NextResponse("Unauthorized", { status: 401 });

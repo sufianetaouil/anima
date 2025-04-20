@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
-import { formatPhoneNumber } from "@/lib/utils";
 
 type Params = Promise<{ employeeId: string }>;
 
@@ -61,7 +60,7 @@ export async function PUT(
         city: body.city,
         state: body.state,
         zip: body.zip,
-        phone: body.phone ? formatPhoneNumber(body.phone) : null,
+        phone: body.phone || null,
         position: body.position,
         jobType: body.jobType,
         jobTime: body.jobTime,

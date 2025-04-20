@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
-import { Session } from "next-auth";
+import { getSession } from "@/lib/auth";
 
 type Params = Promise<{ jobId: string }>;
 
@@ -11,7 +9,7 @@ export async function GET(
   { params }: { params: Params }
 ) {
   try {
-    const session = await getServerSession(authOptions) as Session;
+    const session = await getSession();
     const resolvedParams = await params;
 
     if (!session) {
@@ -39,7 +37,7 @@ export async function PUT(
   { params }: { params: Params }
 ) {
   try {
-    const session = await getServerSession(authOptions) as Session;
+    const session = await getSession();
     const resolvedParams = await params;
 
     if (!session) {
@@ -85,7 +83,7 @@ export async function DELETE(
   { params }: { params: Params }
 ) {
   try {
-    const session = await getServerSession(authOptions) as Session;
+    const session = await getSession();
     const resolvedParams = await params;
 
     if (!session) {
